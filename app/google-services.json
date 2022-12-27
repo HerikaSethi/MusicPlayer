@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1075183172173",
+    "project_id": "musicapp-2628b",
+    "storage_bucket": "musicapp-2628b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1075183172173:android:abe507b1d978330970ba04",
+        "android_client_info": {
+          "package_name": "com.herika.musicplayer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1075183172173-4ig78t2o9a4rt3b9156q6kpume331aud.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.herika.musicplayer",
+            "certificate_hash": "48256edb784d2d34c684e07a6d667d8eff742f2d"
+          }
+        },
+        {
+          "client_id": "1075183172173-9qkau3m35enltvi5ujhl3n9gv27o5jl1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByqn8uAyzHGLgg_lBK6Ts5xoNx1VHtIQg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1075183172173-9qkau3m35enltvi5ujhl3n9gv27o5jl1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

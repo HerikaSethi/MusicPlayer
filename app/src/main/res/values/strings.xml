@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MusicPlayer</string>
+    <string name="music_list">music_list</string>
+    <string name="type">type</string>
+    <string name="song1">song1</string>
+    <string name="song2">song2</string>
+    <string name="audiourl">audiourl</string>
+</resources>
