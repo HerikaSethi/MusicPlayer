@@ -10,6 +10,7 @@ class NotificationReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         when(intent?.action){
             ApplicationClass.PLAY -> Toast.makeText(context, "Play btn clicked from notification", Toast.LENGTH_SHORT).show()
+            ApplicationClass.EXIT -> Toast.makeText(context, "Exit btn clicked from notification", Toast.LENGTH_SHORT).show()
         }
     }
 }

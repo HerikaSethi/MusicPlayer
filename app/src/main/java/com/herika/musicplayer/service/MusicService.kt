@@ -56,13 +56,14 @@ class MusicService: Service() {
             .setContentIntent(contentIntent)
             .setContentTitle("music title")
             .setContentText("This is content text")
-            .setSmallIcon(R.drawable.musicimg1)
-            .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.img_play))
+            .setSmallIcon(R.drawable.icon_music)
+//            .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.img_play))
             .setStyle(androidx.media.app.NotificationCompat.MediaStyle().setMediaSession(mediaSession.sessionToken))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setOnlyAlertOnce(true)  //only one notification for every music not a new notification for every music
-            .addAction(R.drawable.img_play,"Play",playPendingIntent)
+            .addAction(R.drawable.icon_exit,"Exit", exitPendingIntent)
+            .addAction(R.drawable.icon_play,"Play",playPendingIntent)
             .build()
 
         startForeground(13, notification)
