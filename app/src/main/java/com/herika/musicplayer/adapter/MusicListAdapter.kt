@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.herika.musicplayer.MusicDetailActivity
+import com.herika.musicplayer.PlayMusicActivity
 import com.herika.musicplayer.R
 import com.herika.musicplayer.model.MusicItems
 import com.herika.musicplayer.utils.HelperConstant
@@ -35,7 +36,7 @@ class MusicListAdapter(private val context: Context, private val musicItems: Lis
         holder.musicTitle.text = musicItems[position].songTitle
 
         holder.lMainLayout.setOnClickListener {
-            val intent = Intent(context, MusicDetailActivity::class.java)
+            val intent = Intent(context, PlayMusicActivity::class.java)
             intent.putExtra(HelperConstant.IMAGE, musicItems[position].songImage)
             intent.putExtra(HelperConstant.TITLE, musicItems[position].songTitle)
             context.startActivity(intent)

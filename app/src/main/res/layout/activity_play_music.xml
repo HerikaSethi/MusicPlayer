@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0F282B"
-    tools:context=".MusicDetailActivity">
+    android:background="#0F282B">
 
     <ImageView
         android:layout_width="match_parent"
@@ -32,7 +31,7 @@
         android:layout_height="50dp"
         android:layout_marginBottom="56dp"
         android:visibility="invisible"
-        android:background="@drawable/img_pause"
+        android:icon="@drawable/img_pause"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>

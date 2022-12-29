@@ -1,24 +1,29 @@
 package com.herika.musicplayer
 
-import android.media.AudioManager
+import android.content.ComponentName
+import android.content.Intent
+import android.content.ServiceConnection
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
+import com.herika.musicplayer.service.MusicService
 import com.herika.musicplayer.utils.HelperConstant
 import org.json.JSONObject
 
 
-class MusicDetailActivity : AppCompatActivity() {
+class MusicDetailActivity : AppCompatActivity(), ServiceConnection {
 
     companion object{
         const val TAG = "MusicDetailActivity"
@@ -32,11 +37,20 @@ class MusicDetailActivity : AppCompatActivity() {
     lateinit var btnPause: Button
     lateinit var seekBar: SeekBar
     var mediaPlayer: MediaPlayer = MediaPlayer()
+
+    var musicService: MusicService? = null
     var song: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_music_detail)
+
+        //For starting service
+        val intent = Intent(this, MusicService::class.java)
+        bindService(intent, this, BIND_AUTO_CREATE)
+        startService(intent)
+
+
         btnPlay = findViewById(R.id.btnPlay)
         btnPause = findViewById(R.id.btnPause)
         seekBar = findViewById(R.id.seekBar)
@@ -47,13 +61,28 @@ class MusicDetailActivity : AppCompatActivity() {
 
         fetchRemoteConfigSongListItem(intent.getStringExtra(HelperConstant.TITLE))
 
-        btnPlay.setOnClickListener {
-            setUpPlayClickListener()
-        }
+//        btnPlay.setOnClickListener {
+//            setUpPlayClickListener()
+//        }
 
         btnPause.setOnClickListener {
             setUpPauseClickListener()
         }
+
+        this
+            .onBackPressedDispatcher
+            .addCallback(
+                this,
+                object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                       mediaPlayer!!.stop()
+                        btnPause.visibility = View.INVISIBLE
+                        btnPlay.visibility = View.VISIBLE
+                        val intent = Intent(this@MusicDetailActivity, MainActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+            )
 
     }
 
@@ -61,35 +90,36 @@ class MusicDetailActivity : AppCompatActivity() {
         btnPause.visibility = View.INVISIBLE
         btnPlay.visibility = View.VISIBLE
         //check media player if audio is playing or not
-       if (mediaPlayer.isPlaying){
-           //pausing the media player if media is playing
+        if (mediaPlayer!!.isPlaying){
+            //pausing the media player if media is playing
 
-           mediaPlayer.stop()
-           mediaPlayer.reset()
-           //mediaPlayer.release()
-       }else{
-           Toast.makeText(this, "Audio has not played", Toast.LENGTH_SHORT).show();
-       }
+            mediaPlayer!!.stop()
+            mediaPlayer!!.reset()
+            //mediaPlayer.release()
+        }else{
+            Toast.makeText(this, "Audio has not played", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private fun setUpPlayClickListener() {
         btnPlay.visibility = View.INVISIBLE
         btnPause.visibility = View.VISIBLE
 
-           // mediaPlayer = MediaPlayer()
-           // mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
+        // mediaPlayer = MediaPlayer()
+        // mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
         if (pause){
-            mediaPlayer.seekTo(mediaPlayer.currentPosition)
-            mediaPlayer.start()
+            mediaPlayer?.seekTo(mediaPlayer!!.currentPosition)
+            mediaPlayer?.start()
             pause = false
         }else {
             try {
                 //set url to media player
-                mediaPlayer.setDataSource("https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3")
+                mediaPlayer?.setDataSource("https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3")
 
                 //prepare and start media player
-                mediaPlayer.prepare()
-                mediaPlayer.start()
+              mediaPlayer?.prepare()
+               mediaPlayer?.start()
+
                 Toast.makeText(this, "Audio started playing", Toast.LENGTH_SHORT).show()
 
 
@@ -167,6 +197,19 @@ class MusicDetailActivity : AppCompatActivity() {
                 }
             }
 
+    }
+
+    override fun onServiceConnected(p0: ComponentName?, service: IBinder?) {
+        val binder = service as MusicService.MyBinder
+        musicService = binder.currentService()
+
+        btnPlay.setOnClickListener {
+            setUpPlayClickListener()
+        }
+    }
+
+    override fun onServiceDisconnected(p0: ComponentName?) {
+        musicService = null
     }
 
 

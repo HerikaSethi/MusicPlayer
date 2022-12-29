@@ -5,6 +5,7 @@
       <map>
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.165" />
         <entry key="app/src/main/res/layout/activity_music_detail.xml" value="0.165" />
+        <entry key="app/src/main/res/layout/activity_play_music.xml" value="0.1203125" />
         <entry key="app/src/main/res/layout/each_item_music.xml" value="0.22083333333333333" />
       </map>
     </option>
