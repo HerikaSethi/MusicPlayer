@@ -1,6 +1,8 @@
 package com.herika.musicplayer
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.media.MediaMetadataRetriever
@@ -14,13 +16,18 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
+import com.herika.musicplayer.databinding.ActivityPlayMusicBinding
 import com.herika.musicplayer.model.SongItems
 import com.herika.musicplayer.service.MusicService
 import com.herika.musicplayer.utils.HelperConstant
+import com.herika.musicplayer.viewmodel.MyViewModel
+import com.herika.musicplayer.viewmodel.ViewModelFactory
 import org.json.JSONObject
 
 
@@ -28,33 +35,47 @@ class PlayMusicActivity : AppCompatActivity(), ServiceConnection {
 
     companion object{
         const val TAG = "PlayMusicActivity"
+        var isPlaying = false
+        var musicService: MusicService? = null
+
+        @SuppressLint("StaticFieldLeak")
+        lateinit var databinding: ActivityPlayMusicBinding
     }
 
-    private lateinit var remoteConfig: FirebaseRemoteConfig
+private lateinit var remoteConfig: FirebaseRemoteConfig
     private lateinit var runnable:Runnable
     private var handler: Handler = Handler()
     private var pause:Boolean = false
-    lateinit var btnPlay: Button
+    //lateinit var btnPlay: Button
     lateinit var seekBar: SeekBar
-    var isPlaying = false
+
     //var mediaPlayer: MediaPlayer? = null
+
 
     lateinit var tvTitle:TextView
     lateinit var tvAuthor: TextView
+    private lateinit var mViewModel: MyViewModel
 
-    var musicService: MusicService? = null
+
+
     private val songList: MutableList<SongItems> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_play_music)
+        databinding = ActivityPlayMusicBinding.inflate(layoutInflater)
+        setContentView(databinding.root)
+        //databinding = DataBindingUtil.setContentView(this, R.layout.activity_play_music)
+       // setContentView(R.layout.activity_play_music)
+
+
         tvTitle = findViewById(R.id.tvSongTitle)
         tvAuthor = findViewById(R.id.tvSongAuthor)
 
 
-
+        //receive intent from recyclerView Adapter
         val title = intent.extras?.get(HelperConstant.TITLE)?.toString()
-        Log.d(TAG, "onCreate: title ${title}")
+
+        setUpViewModel()
 
         //for starting service
         val intent = Intent(this, MusicService::class.java)
@@ -63,14 +84,19 @@ class PlayMusicActivity : AppCompatActivity(), ServiceConnection {
 
         fetchRemoteConfigSongListItem(title)
 
-        btnPlay = findViewById(R.id.btnPlay)
+        //btnPlay = findViewById(R.id.btnPlay)
         //createMediaPlayer()
-        btnPlay.setOnClickListener {
+        databinding.btnPlay.setOnClickListener {
             if (isPlaying) pauseMusic()
             else playMusic()
         }
 
 
+    }
+
+    private fun setUpViewModel() {
+        val viewModelFactory = ViewModelFactory()
+        mViewModel = ViewModelProvider(this, viewModelFactory).get(MyViewModel::class.java)
     }
 
     private fun fetchRemoteConfigSongListItem(title: String?) {
@@ -207,7 +233,33 @@ class PlayMusicActivity : AppCompatActivity(), ServiceConnection {
             Log.d(TAG, "setUpUI: title ${it.title}  author: ${it.author}")
             tvTitle.text = it.title
             tvAuthor.text = it.author
+
+            HelperConstant.SET_SONG_URL = it.url
+            HelperConstant.SET_SONG_AUTHOR = it.author
+
+            mViewModel.SongsAuthorLiveData.postValue(it.author)
+            intent.putExtra("AUTH", it.author)
+
+            saveDataToSharedPreferences(it.url, it.author, it.title, it.startTime, it.endTime)
         }
+    }
+
+    private fun saveDataToSharedPreferences(
+        url: String,
+        author: String,
+        title: String,
+        startTime: String,
+        endTime: String
+    ) {
+
+        val sharedPreferences = getSharedPreferences("SP_INFO",Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString(HelperConstant.URL, url)
+        editor.putString(HelperConstant.AUTHOR, author)
+        editor.putString(HelperConstant.SONGTITLE, title)
+        editor.putString(HelperConstant.STARTTIME, startTime)
+        editor.putString(HelperConstant.ENDTIME, endTime)
+        editor.apply()
     }
 
 
@@ -222,7 +274,7 @@ class PlayMusicActivity : AppCompatActivity(), ServiceConnection {
             musicService?.mediaPlayer!!.start()
 
             isPlaying = true
-            btnPlay.setBackgroundResource(R.drawable.img_pause)
+            databinding.btnPlay.setBackgroundResource(R.drawable.img_pause)
         }catch(e:Exception){
             Log.d("test", "createMediaPlayer: ${e.message}")
         }
@@ -230,12 +282,14 @@ class PlayMusicActivity : AppCompatActivity(), ServiceConnection {
     }
 
     private fun playMusic(){
-        btnPlay.setBackgroundResource(R.drawable.img_pause)
+        databinding.btnPlay.setBackgroundResource(R.drawable.img_pause)
+        musicService?.showNotification(R.drawable.icon_pause)
         isPlaying = true
         musicService?.mediaPlayer?.start()
     }
     private fun pauseMusic(){
-        btnPlay.setBackgroundResource(R.drawable.img_play)
+        databinding.btnPlay.setBackgroundResource(R.drawable.img_play)
+        musicService?.showNotification(R.drawable.icon_play)
         isPlaying = false
         musicService?.mediaPlayer?.pause()
     }
@@ -244,10 +298,11 @@ class PlayMusicActivity : AppCompatActivity(), ServiceConnection {
         val binder = service as MusicService.MyBinder
         musicService = binder.currentService()
         createMediaPlayer()
-        musicService!!.showNotification()
+        musicService!!.showNotification(R.drawable.icon_pause)
     }
 
     override fun onServiceDisconnected(p0: ComponentName?) {
         musicService = null
     }
+
 }
