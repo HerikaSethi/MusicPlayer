@@ -23,6 +23,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.herika.musicplayer.databinding.ActivityPlayMusicBinding
+import com.herika.musicplayer.manager.formatDuration
 import com.herika.musicplayer.model.SongItems
 import com.herika.musicplayer.service.MusicService
 import com.herika.musicplayer.utils.HelperConstant
@@ -46,8 +47,8 @@ private lateinit var remoteConfig: FirebaseRemoteConfig
     private lateinit var runnable:Runnable
     private var handler: Handler = Handler()
     private var pause:Boolean = false
-    //lateinit var btnPlay: Button
-    lateinit var seekBar: SeekBar
+
+
 
     //var mediaPlayer: MediaPlayer? = null
 
@@ -64,8 +65,8 @@ private lateinit var remoteConfig: FirebaseRemoteConfig
         super.onCreate(savedInstanceState)
         databinding = ActivityPlayMusicBinding.inflate(layoutInflater)
         setContentView(databinding.root)
-        //databinding = DataBindingUtil.setContentView(this, R.layout.activity_play_music)
-       // setContentView(R.layout.activity_play_music)
+//        databinding = DataBindingUtil.setContentView(this, R.layout.activity_play_music)
+//        setContentView(R.layout.activity_play_music)
 
 
         tvTitle = findViewById(R.id.tvSongTitle)
@@ -90,6 +91,19 @@ private lateinit var remoteConfig: FirebaseRemoteConfig
             if (isPlaying) pauseMusic()
             else playMusic()
         }
+
+        //seekbar
+        databinding.seekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(p0: SeekBar?, progress: Int, isFromUser: Boolean) {
+                if (isFromUser){
+                    musicService?.mediaPlayer?.seekTo(progress)
+                }
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {}
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {}
+        })
 
 
     }
@@ -211,6 +225,98 @@ private lateinit var remoteConfig: FirebaseRemoteConfig
                                  setUpUI()
                              }
                          }
+
+                         "Song3" -> {
+                             if (ob.has(resources.getString(R.string.song3))) {
+                                 val thirdSongUrl =
+                                     ob.getJSONObject(resources.getString(R.string.song3))
+                                         .getString(resources.getString(R.string.audiourl))
+                                 Log.d(
+                                     TAG,
+                                     "onCreate: squareEndPoint:: $thirdSongUrl"
+                                 )
+
+                                 val thirdSongTitle =
+                                     ob.getJSONObject(resources.getString(R.string.song3))
+                                         .getString(resources.getString(R.string.title))
+                                 Log.d(TAG, "fetchRemoteConfigSongListItem:: title: $thirdSongTitle")
+                                 //tvTitle.text = secondSongTitle
+
+
+
+                                 val thirdSongAuthor =
+                                     ob.getJSONObject(resources.getString(R.string.song3))
+                                         .getString(resources.getString(R.string.author))
+                                 Log.d(
+                                     TAG,
+                                     "fetchRemoteConfigSongListItem:: author: $thirdSongAuthor"
+                                 )
+
+                                 val thirdSongStartTime =
+                                     ob.getJSONObject(resources.getString(R.string.song3))
+                                         .getString(resources.getString(R.string.startTime))
+                                 Log.d(
+                                     TAG,
+                                     "fetchRemoteConfigSongListItem:: startTime: $thirdSongStartTime"
+                                 )
+
+                                 val thirdSongEndTime =
+                                     ob.getJSONObject(resources.getString(R.string.song3))
+                                         .getString(resources.getString(R.string.endTime))
+                                 Log.d(
+                                     TAG,
+                                     "fetchRemoteConfigSongListItem:: endTime: $thirdSongEndTime"
+                                 )
+                                 songList.add(SongItems(thirdSongUrl,thirdSongTitle,thirdSongAuthor,thirdSongStartTime,thirdSongEndTime))
+                                 setUpUI()
+                             }
+                         }
+
+                         "Song4" -> {
+                             if (ob.has(resources.getString(R.string.song4))) {
+                                 val fourthSongUrl =
+                                     ob.getJSONObject(resources.getString(R.string.song4))
+                                         .getString(resources.getString(R.string.audiourl))
+                                 Log.d(
+                                     TAG,
+                                     "onCreate: squareEndPoint:: $fourthSongUrl"
+                                 )
+
+                                 val fourthSongTitle =
+                                     ob.getJSONObject(resources.getString(R.string.song4))
+                                         .getString(resources.getString(R.string.title))
+                                 Log.d(TAG, "fetchRemoteConfigSongListItem:: title: $fourthSongTitle")
+                                 //tvTitle.text = secondSongTitle
+
+
+
+                                 val fourthSongAuthor =
+                                     ob.getJSONObject(resources.getString(R.string.song4))
+                                         .getString(resources.getString(R.string.author))
+                                 Log.d(
+                                     TAG,
+                                     "fetchRemoteConfigSongListItem:: author: $fourthSongAuthor"
+                                 )
+
+                                 val fourthSongStartTime =
+                                     ob.getJSONObject(resources.getString(R.string.song4))
+                                         .getString(resources.getString(R.string.startTime))
+                                 Log.d(
+                                     TAG,
+                                     "fetchRemoteConfigSongListItem:: startTime: $fourthSongStartTime"
+                                 )
+
+                                 val fourthSongEndTime =
+                                     ob.getJSONObject(resources.getString(R.string.song4))
+                                         .getString(resources.getString(R.string.endTime))
+                                 Log.d(
+                                     TAG,
+                                     "fetchRemoteConfigSongListItem:: endTime: $fourthSongEndTime"
+                                 )
+                                 songList.add(SongItems(fourthSongUrl,fourthSongTitle,fourthSongAuthor,fourthSongStartTime,fourthSongEndTime))
+                                 setUpUI()
+                             }
+                         }
                      }
 
                     }
@@ -268,13 +374,23 @@ private lateinit var remoteConfig: FirebaseRemoteConfig
             if(musicService?.mediaPlayer == null) musicService?.mediaPlayer = MediaPlayer()
             musicService?.mediaPlayer!!.reset()
 
-            musicService?.mediaPlayer!!.setDataSource("https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3")
+            musicService?.mediaPlayer!!.setDataSource("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3")
 
             musicService?.mediaPlayer!!.prepare()
             musicService?.mediaPlayer!!.start()
 
             isPlaying = true
             databinding.btnPlay.setBackgroundResource(R.drawable.img_pause)
+
+            //seekbar setup
+            Log.d(TAG, "createMediaPlayer:seekbar startTime ${formatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())}")
+            databinding.tvSongStartTime.text = formatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
+            Log.d(TAG, "createMediaPlayer:seekbar endTime ${formatDuration(musicService!!.mediaPlayer!!.duration.toLong())}")
+            databinding.tvSongEndTime.text = formatDuration(musicService!!.mediaPlayer!!.duration.toLong())
+
+            databinding.seekBar.progress = 0
+            databinding.seekBar.max = musicService!!.mediaPlayer!!.duration
+
         }catch(e:Exception){
             Log.d("test", "createMediaPlayer: ${e.message}")
         }
@@ -299,6 +415,7 @@ private lateinit var remoteConfig: FirebaseRemoteConfig
         musicService = binder.currentService()
         createMediaPlayer()
         musicService!!.showNotification(R.drawable.icon_pause)
+        musicService!!.setUpSeekBar()
     }
 
     override fun onServiceDisconnected(p0: ComponentName?) {

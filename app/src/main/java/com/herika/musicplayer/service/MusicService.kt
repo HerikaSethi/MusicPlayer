@@ -7,9 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.MediaPlayer
-import android.os.Binder
-import android.os.Build
-import android.os.IBinder
+import android.os.*
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -18,6 +16,7 @@ import com.herika.musicplayer.ApplicationClass
 import com.herika.musicplayer.MainActivity
 import com.herika.musicplayer.PlayMusicActivity
 import com.herika.musicplayer.R
+import com.herika.musicplayer.manager.formatDuration
 import com.herika.musicplayer.receiver.NotificationReceiver
 import com.herika.musicplayer.utils.HelperConstant
 import com.herika.musicplayer.viewmodel.MyViewModel
@@ -27,6 +26,8 @@ class MusicService: Service() {
     private var myBinder = MyBinder()
     var mediaPlayer: MediaPlayer? = null
     private lateinit var mediaSession: MediaSessionCompat
+
+    private lateinit var runnable: Runnable
 
     private lateinit var mViewModel: MyViewModel
 
@@ -89,7 +90,15 @@ class MusicService: Service() {
 
         startForeground(13, notification)
 
+    }
 
+    fun setUpSeekBar(){
+        runnable = Runnable{
+            PlayMusicActivity.databinding.tvSongStartTime.text = formatDuration(PlayMusicActivity.musicService!!.mediaPlayer!!.currentPosition.toLong())
+            PlayMusicActivity.databinding.seekBar.progress = mediaPlayer!!.currentPosition
+            Handler(Looper.getMainLooper()).postDelayed(runnable, 200)
+        }
+        Handler(Looper.getMainLooper()).postDelayed(runnable, 0)
     }
 
 }

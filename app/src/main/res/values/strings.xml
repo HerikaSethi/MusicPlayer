@@ -4,6 +4,8 @@
     <string name="type">type</string>
     <string name="song1">song1</string>
     <string name="song2">song2</string>
+    <string name="song3">song3</string>
+    <string name="song4">song4</string>
     <string name="audiourl">audiourl</string>
 
 <!--    Remote config-->
