@@ -64,14 +64,16 @@ class MusicService: Service() {
         val exitPendingIntent = PendingIntent.getBroadcast(baseContext, 0, exitIntent, flag)
 
         mViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(application).create(MyViewModel::class.java)
-        Log.d("testview", "showNotification:viewmodel  ${mViewModel.SongsAuthorLiveData.value.toString()}")
+
 
 
 
         /** Retrieve data from shared preferences*/
         val sharedPreferences = getSharedPreferences("SP_INFO", Context.MODE_PRIVATE)
         val name = sharedPreferences.getString(HelperConstant.AUTHOR,"")
-        Log.d(PlayMusicActivity.TAG, "saveDataToSharedPreferences:::: ${name}")
+        val title = sharedPreferences.getString(HelperConstant.TITLE,"")
+        Log.d(PlayMusicActivity.TAG, "saveDataToSharedPreferences:::: title ${title}")
+        Log.d(PlayMusicActivity.TAG, "saveDataToSharedPreferences:::: name ${name}")
 
 
         val notification = NotificationCompat.Builder(baseContext, ApplicationClass.CHANNEL_ID)
